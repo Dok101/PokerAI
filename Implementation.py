@@ -6,24 +6,28 @@ import pyautogui
 import time
 from tkinter import Tk
 
-
 def get_pixel_colour(x, y):
     pixel = ImageGrab.grab().load()[x, y][1]
     if pixel == 3 or pixel == 0:
-        return "S"
+        return "s"
     elif pixel == 163 or pixel == 124:
-        return "C"
+        return "c"
     elif pixel == 25:
-        return "D"
+        return "d"
     elif pixel == 16:
-        return "H"
+        return "h"
     else:
         print("Something has gone wrong: " + str(ImageGrab.grab().load()[x, y]))
 
 
 def interpret_message(msg):
-    if msg
-
+    if "Dealing Flop" in msg:
+        msg.replace("Dealer: Dealing Flop: [", "").replace("]", "")
+        vals = msg.split()
+        print (vals)
+        global cards
+        for val in vals:
+            cards[convert_to_num(val) + 103] = 1
 
 def capture(monitor, iterat):
     with mss.mss() as sct:
@@ -45,25 +49,29 @@ def get_info():
     time.sleep(0.1)
 
 def convert_to_num (card):
-    converter = {'HA': 1, 'H2': 2, 'H3': 3, 'H4': 4, 'H5': 5, 'H6': 6, 'H7': 7, 'H8': 8, 'H9': 9, 'HT': 10, 'HJ': 11,
-                 'HQ': 12, 'HK': 13, 'CA': 14, 'C2': 15, 'C3': 16, 'C4': 17, 'C5': 18, 'C6': 19, 'C7': 20, 'C8': 21,
-                 'C9': 22, 'CT': 23, 'CJ': 24, 'CQ': 25, 'CK': 26, 'SA': 27, 'S2': 28, 'S3': 29, 'S4': 30, 'S5': 31,
-                 'S6': 32, 'S7': 33, 'S8': 34, 'S9': 35, 'ST': 36, 'SJ': 37, 'SQ': 38, 'SK': 39, 'DA': 40, 'D2': 41,
-                 'D3': 42, 'D4': 43, 'D5': 44, 'D6': 45, 'D7': 46, 'D8': 47, 'D9': 48, 'DT': 49, 'DJ': 50, 'DQ': 51,
-                 'DK': 52}
+    converter = {'Ah': 1, '2h': 2, '3h': 3, '4h': 4, '5h': 5, '6h': 6, '7h': 7, '8h': 8, '9h': 9, 'Th': 10, 'Jh': 11,
+                 'Qh': 12, 'Kh': 13, 'Ac': 14, '2c': 15, '3c': 16, '4c': 17, '5c': 18, '6c': 19, '7c': 20, '8c': 21,
+                 '9c': 22, 'Tc': 23, 'Jc': 24, 'Qc': 25, 'Kc': 26, 'As': 27, '2s': 28, '3s': 29, '4s': 30, '5s': 31,
+                 '6s': 32, '7s': 33, '8s': 34, '9s': 35, 'Ts': 36, 'Js': 37, 'Qs': 38, 'Ks': 39, 'Ad': 40, '2d': 41,
+                 '3d': 42, '4d': 43, '5d': 44, '6d': 45, '7d': 46, '8d': 47, '9d': 48, 'Td': 49, 'Jd': 50, 'Qd': 51,
+                 'Kd': 52}
+
+    return converter[card]
 
 
 if __name__ == "__main__":
-    cards = [0 for a in range(367)]
+    cards = [0 for a in range(157)]
 
     #Get info for Hole Card One
     num1 = capture(monitor1, "One")
     monitor1 = {'top': 828, 'left': 1182, 'width': 28, 'height': 40}
     suit1 = get_pixel_colour(1193, 883)
-    cards[convert_to_num(suit1 + num1)] = 1
+    cards[convert_to_num(num1 + suit1) - 1] = 1 #Must be -1, as I started the converter dictionary from 1
 
     #Get info for Hole Card Two
     num2 = capture(monitor2, "Two")
     monitor2 = {'top': 828, 'left': 1287, 'width': 28, 'height': 40}
     suit2 = get_pixel_colour(1299, 883)
-    cards[convert_to_num(suit2 + num2)] = 1
+    cards[convert_to_num(num2 + suit2) + 51] = 1 #+51 as it's after the first 52 possible cards, but -1 for the aformentioned reason.
+
+
