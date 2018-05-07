@@ -2,14 +2,9 @@ import mss
 import mss.tools
 from PIL import Image, ImageGrab
 import pytesseract
-import numpy as np
-
-
-# def classify (avg_colour):
-# Diamonds = (9, 9, 237) =
-# Spades = (0, 0, 0) =
-# Hearts = (201, 16, 16) =
-# Clubs = (57. 140, 27) =
+import pyautogui
+import time
+from tkinter import Tk
 
 def get_pixel_colour(x, y):
     pixel = ImageGrab.grab().load()[x, y][1]
@@ -24,6 +19,8 @@ def get_pixel_colour(x, y):
     else:
         print("Something has gone wrong: " + str(ImageGrab.grab().load()[x, y]))
 
+def interpret_message(msg):
+    if msg
 
 def capture(monitor, iterat):
     with mss.mss() as sct:
@@ -33,11 +30,20 @@ def capture(monitor, iterat):
 
         image = Image.open(r"C:\Users\Devin\PycharmProjects\PokerAI\Hole_Card{}.png".format(iterat))
         num = pytesseract.image_to_string(image, config='--psm 6')
-        num = num.replace("'", "")
+        num = num.replace("‘", "").replace("I", "1")
         return num
 
+def get_info ():
+    pyautogui.click(910, 1230)
+    pyautogui.hotkey('ctrl', 'c')
+    text = Tk().clipboard_get()
+    interpret_message(text)
+    time.sleep(0.1)
 
 if __name__ == "__main__":
+
+    cards = []
+
     monitor1 = {'top': 828, 'left': 1182, 'width': 28, 'height': 40}
     monitor2 = {'top': 828, 'left': 1287, 'width': 28, 'height': 40}
 
