@@ -17,18 +17,18 @@ def convert_to_num (card):
 
     return converter[card]
 
-def get_pixel_colour(x, y):
+def get_pixel_colour(x, y, num):
     pixel = ImageGrab.grab().load()[x, y][1]
-    if pixel == 3 or pixel == 0:
+    if pixel == 3 or pixel == 0 or pixel == 90 or pixel == 13:
         return "s"
-    elif pixel == 163 or pixel == 124:
+    elif pixel == 163 or pixel == 124 or pixel == 207 or pixel == 147:
         return "c"
     elif pixel == 25:
         return "d"
     elif pixel == 16:
         return "h"
     else:
-        print("Something has gone wrong: " + str(ImageGrab.grab().load()[x, y]))
+        print("Something has gone wrong on the {} card: ".format(num) + str(ImageGrab.grab().load()[x, y]))
 
 def interpret_message(msg, old_msg):
 
@@ -62,7 +62,10 @@ def interpret_message(msg, old_msg):
             cards[156] = int(msg)
 
         elif "Starting new hand" in msg:
-            cards = init()
+            global roundIsGoing
+            roundIsGoing = False
+            print (cards)
+            init()
 
 def capture(monitor, path, config):
     with mss.mss() as sct:
@@ -81,29 +84,39 @@ def get_info():
     text = Tk().clipboard_get()
     interpret_message(text)
 
+def get_pot():
     global cards
     monitor = {'top': 1180, 'left': 470, 'width': 220, 'height': 50}
     cards[157] = capture(monitor, r"C:\Users\Devin\PycharmProjects\PokerAI\Pot_Amount.png", "--psm 7")
 
-    time.sleep(0.1)
-
 def init ():
+
+    roundIsGoing = True
 
     global cards
     cards = [0 for a in range(158)]
 
     # Get info for Hole Card One
     monitor1 = {'top': 828, 'left': 1182, 'width': 28, 'height': 40}
-    num1 = capture(monitor1, r"C:\Users\Devin\PycharmProjects\PokerAI\Hole_Card_One.png", "--psm 6")
-    suit1 = get_pixel_colour(1193, 883)
+    num1 = str(capture(monitor1, r"C:\Users\Devin\PycharmProjects\PokerAI\Hole_Card_One.png", "--psm 6"))
+    suit1 = get_pixel_colour(1193, 883, "1")
     cards[convert_to_num(num1 + suit1) - 1] = 1  # Must be -1, as I started the converter dictionary from 1
 
     # Get info for Hole Card Two
     monitor2 = {'top': 828, 'left': 1287, 'width': 28, 'height': 40}
-    num2 = capture(monitor2, r"C:\Users\Devin\PycharmProjects\PokerAI\Hole_Card_Two.png", "--psm 6")
-    suit2 = get_pixel_colour(1299, 883)
+    num2 = str(capture(monitor2, r"C:\Users\Devin\PycharmProjects\PokerAI\Hole_Card_Two.png", "--psm 6"))
+    suit2 = get_pixel_colour(1299, 883, "2")
     cards[convert_to_num(num2 + suit2) + 51] = 1  #+51 as it's after the first 52 possible cards, but -1 for the aformentioned reason.
 
+    print (str(num1) + str(suit1) + ", " + str(num2) + str(suit2))
+
+    while roundIsGoing == True:
+        get_pot()
+        time.sleep(3)
+        print (cards)
+    while roundIsGoing == True:
+        get_info()
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     cards = []
