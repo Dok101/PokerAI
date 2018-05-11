@@ -8,11 +8,11 @@ from tkinter import Tk
 import re
 
 def convert_to_num (card):
-    converter = {'Ah': 1, '2h': 2, '3h': 3, '4h': 4, '5h': 5, '6h': 6, '7h': 7, '8h': 8, '9h': 9, 'Th': 10, 'Jh': 11,
+    converter = {'Ah': 1, '2h': 2, '3h': 3, '4h': 4, '5h': 5, '6h': 6, '7h': 7, '8h': 8, '9h': 9, '10h': 10, 'Th': 10, 'Jh': 11,
                  'Qh': 12, 'Kh': 13, 'Ac': 14, '2c': 15, '3c': 16, '4c': 17, '5c': 18, '6c': 19, '7c': 20, '8c': 21,
-                 '9c': 22, 'Tc': 23, 'Jc': 24, 'Qc': 25, 'Kc': 26, 'As': 27, '2s': 28, '3s': 29, '4s': 30, '5s': 31,
-                 '6s': 32, '7s': 33, '8s': 34, '9s': 35, 'Ts': 36, 'Js': 37, 'Qs': 38, 'Ks': 39, 'Ad': 40, '2d': 41,
-                 '3d': 42, '4d': 43, '5d': 44, '6d': 45, '7d': 46, '8d': 47, '9d': 48, 'Td': 49, 'Jd': 50, 'Qd': 51,
+                 '9c': 22, '10c': 23, 'Tc': 23, 'Jc': 24, 'Qc': 25, 'Kc': 26, 'As': 27, '2s': 28, '3s': 29, '4s': 30, '5s': 31,
+                 '6s': 32, '7s': 33, '8s': 34, '9s': 35, '10s': 36, 'Ts': 36, 'Js': 37, 'Qs': 38, 'Ks': 39, 'Ad': 40, '2d': 41,
+                 '3d': 42, '4d': 43, '5d': 44, '6d': 45, '7d': 46, '8d': 47, '9d': 48, '10d': 49, 'Td': 49, 'Jd': 50, 'Qd': 51,
                  'Kd': 52}
 
     return converter[card]
@@ -30,13 +30,16 @@ def get_pixel_colour(x, y, num):
     else:
         print("Something has gone wrong on the {} card: ".format(num) + str(ImageGrab.grab().load()[x, y]))
 
-def interpret_message(msg, old_msg):
-
+def interpret_message(msg):
+    print (msg)
     if msg == old_msg:
         pass
 
     else:
+        global old_msg
         global cards
+
+        old_msg = msg
 
         if "Dealing Flop" in msg:
             msg = msg.replace("Dealer: Dealing Flop: [", "").replace("]", "")
@@ -86,13 +89,12 @@ def get_info():
 
 def get_pot():
     global cards
-    monitor = {'top': 1180, 'left': 470, 'width': 220, 'height': 50}
-    cards[157] = capture(monitor, r"C:\Users\Devin\PycharmProjects\PokerAI\Pot_Amount.png", "--psm 7")
+    monitor = {'top': 470, 'left': 1180, 'width': 220, 'height': 50}
+    cards[157] = int(capture(monitor, r"C:\Users\Devin\PycharmProjects\PokerAI\Pot_Amount.png", "--psm 7").replace("Pot: ", "").replace(",", ""))
 
 def init ():
 
     roundIsGoing = True
-
     global cards
     cards = [0 for a in range(158)]
 
@@ -111,13 +113,11 @@ def init ():
     print (str(num1) + str(suit1) + ", " + str(num2) + str(suit2))
 
     while roundIsGoing == True:
-        get_pot()
-        time.sleep(3)
-        print (cards)
-    while roundIsGoing == True:
-        get_info()
-        time.sleep(0.1)
-
+        for i in range (10):
+            get_info()
+            get_pot()
+            print (cards)
 if __name__ == "__main__":
     cards = []
+    old_msg = ""
     init ()
