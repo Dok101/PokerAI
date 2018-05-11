@@ -31,43 +31,42 @@ def get_pixel_colour(x, y, num):
         print("Something has gone wrong on the {} card: ".format(num) + str(ImageGrab.grab().load()[x, y]))
 
 def interpret_message(msg):
-    print (msg)
+    global old_msg
     if msg == old_msg:
         pass
 
     else:
-        global old_msg
+        print (msg)
         global cards
-
         old_msg = msg
 
         if "Dealing Flop" in msg:
             msg = msg.replace("Dealer: Dealing Flop: [", "").replace("]", "")
             vals = msg.split()
-            print (vals)
+            print ("Dealing Flop: " + str(vals))
             for val in vals:
                 cards[convert_to_num(val) + 103] = 1
 
         elif "Dealing Turn" in msg:
             msg = msg.replace("Dealer: Dealing Turn: [", "").replace("]", "")
-            print (msg)
+            print ("Dealing Turn: " + msg)
             cards[convert_to_num(msg) + 103] = 1
 
         elif "Dealing River" in msg:
             msg = msg.replace("Dealer: Dealing River: [", "").replace("]", "")
-            print(msg)
+            print("Dealing River: " + msg)
             cards[convert_to_num(msg) + 103] = 1
 
         elif "raises" in msg:
             msg = msg.split("raises")[-1].split("to")[-1]
             msg = re.sub("[^0-9]", "", msg)
-            print (msg)
+            print ("Someone raised: " + msg)
             cards[156] = int(msg)
 
         elif "Starting new hand" in msg:
             global roundIsGoing
             roundIsGoing = False
-            print (cards)
+            print ("Starting new hand")
             init()
 
 def capture(monitor, path, config):
@@ -82,15 +81,23 @@ def capture(monitor, path, config):
 
 
 def get_info():
+    coords = pyautogui.position()
     pyautogui.click(910, 1230)
     pyautogui.hotkey('ctrl', 'c')
     text = Tk().clipboard_get()
+    pyautogui.click(coords)
     interpret_message(text)
+    #Monitor to screenshot: 505, 1090, 655, 155
+
 
 def get_pot():
     global cards
     monitor = {'top': 470, 'left': 1180, 'width': 220, 'height': 50}
-    cards[157] = int(capture(monitor, r"C:\Users\Devin\PycharmProjects\PokerAI\Pot_Amount.png", "--psm 7").replace("Pot: ", "").replace(",", ""))
+    try:
+        cards[157] = int(capture(monitor, r"C:\Users\Devin\PycharmProjects\PokerAI\Pot_Amount.png", "--psm 7").replace("Pot: ", "").replace(",", ""))
+
+    except:
+        pass
 
 def init ():
 
@@ -116,7 +123,7 @@ def init ():
         for i in range (10):
             get_info()
             get_pot()
-            print (cards)
+
 if __name__ == "__main__":
     cards = []
     old_msg = ""
